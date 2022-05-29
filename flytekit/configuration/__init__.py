@@ -220,7 +220,7 @@ class ImageConfig(object):
 
     @classmethod
     def create_from(
-        cls, default_image: Optional[Image], other_images: typing.Optional[typing.List[Image]] = None
+            cls, default_image: Optional[Image], other_images: typing.Optional[typing.List[Image]] = None
     ) -> ImageConfig:
         if default_image and not isinstance(default_image, Image):
             raise ValueError(f"Default image should be of type Image or None not {type(default_image)}")
@@ -318,15 +318,15 @@ class PlatformConfig(object):
     auth_mode: AuthType = AuthType.STANDARD
 
     def with_parameters(
-        self,
-        endpoint: str = "localhost:30081",
-        insecure: bool = False,
-        insecure_skip_verify: bool = False,
-        command: typing.Optional[typing.List[str]] = None,
-        client_id: typing.Optional[str] = None,
-        client_credentials_secret: typing.Optional[str] = None,
-        scopes: List[str] = None,
-        auth_mode: AuthType = AuthType.STANDARD,
+            self,
+            endpoint: str = "localhost:30081",
+            insecure: bool = False,
+            insecure_skip_verify: bool = False,
+            command: typing.Optional[typing.List[str]] = None,
+            client_id: typing.Optional[str] = None,
+            client_credentials_secret: typing.Optional[str] = None,
+            scopes: List[str] = None,
+            auth_mode: AuthType = AuthType.STANDARD,
     ) -> PlatformConfig:
         return PlatformConfig(
             endpoint=endpoint,
@@ -481,6 +481,28 @@ class GCSConfig(object):
         return GCSConfig(**kwargs)
 
 
+@dataclass
+class AzureBlobConfig(object):
+    """
+    Any Azure blob storage specific configuration.
+    """
+
+    retries: int = 3
+    backoff: datetime.timedelta = datetime.timedelta(seconds=5)
+    storage_account_name: typing.Optional[str] = None
+    storage_account_key: typing.Optional[str] = None
+
+    @classmethod
+    def auto(self, config_file: typing.Union[str, ConfigFile] = None) -> AzureBlobConfig:
+        config_file = get_config_file(config_file)
+        kwargs = {}
+        kwargs = set_if_exists(kwargs, "retries", _internal.AZURE.RETRIES.read(config_file))
+        kwargs = set_if_exists(kwargs, "backoff", _internal.AZURE.BACKOFF_SECONDS.read(config_file))
+        kwargs = set_if_exists(kwargs, "storage_account_name", _internal.AZURE.AZURE_STORAGE_ACCOUNT.read(config_file))
+        kwargs = set_if_exists(kwargs, "storage_account_key", _internal.AZURE.AZURE_STORAGE_KEY.read(config_file))
+        return AzureBlobConfig(**kwargs)
+
+
 @dataclass(init=True, repr=True, eq=True, frozen=True)
 class DataConfig(object):
     """
@@ -491,6 +513,7 @@ class DataConfig(object):
 
     s3: S3Config = S3Config()
     gcs: GCSConfig = GCSConfig()
+    azure: AzureBlobConfig = AzureBlobConfig()
 
     @classmethod
     def auto(cls, config_file: typing.Union[str, ConfigFile] = None) -> DataConfig:
@@ -498,6 +521,7 @@ class DataConfig(object):
         return DataConfig(
             s3=S3Config.auto(config_file),
             gcs=GCSConfig.auto(config_file),
+            azure=AzureBlobConfig.auto(config_file),
         )
 
 
@@ -524,12 +548,12 @@ class Config(object):
     local_sandbox_path: str = tempfile.mkdtemp(prefix="flyte")
 
     def with_params(
-        self,
-        platform: PlatformConfig = None,
-        secrets: SecretsConfig = None,
-        stats: StatsConfig = None,
-        data_config: DataConfig = None,
-        local_sandbox_path: str = None,
+            self,
+            platform: PlatformConfig = None,
+            secrets: SecretsConfig = None,
+            stats: StatsConfig = None,
+            data_config: DataConfig = None,
+            local_sandbox_path: str = None,
     ) -> Config:
         return Config(
             platform=platform or self.platform,
@@ -577,11 +601,11 @@ class Config(object):
 
     @classmethod
     def for_endpoint(
-        cls,
-        endpoint: str,
-        insecure: bool = False,
-        data_config: typing.Optional[DataConfig] = None,
-        config_file: typing.Union[str, ConfigFile] = None,
+            cls,
+            endpoint: str,
+            insecure: bool = False,
+            data_config: typing.Optional[DataConfig] = None,
+            config_file: typing.Union[str, ConfigFile] = None,
     ) -> Config:
         """
         Creates an automatic config for the given endpoint and uses the config_file or environment variable for default.
@@ -683,12 +707,12 @@ class SerializationSettings(object):
 
     @classmethod
     def for_image(
-        cls,
-        image: str,
-        version: str,
-        project: str = "",
-        domain: str = "",
-        python_interpreter_path: str = DEFAULT_RUNTIME_PYTHON_INTERPRETER,
+            cls,
+            image: str,
+            version: str,
+            project: str = "",
+            domain: str = "",
+            python_interpreter_path: str = DEFAULT_RUNTIME_PYTHON_INTERPRETER,
     ) -> SerializationSettings:
         img = ImageConfig(default_image=Image.look_up_image_info(DEFAULT_IMAGE_NAME, tag=image))
         return SerializationSettings(

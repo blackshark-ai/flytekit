@@ -182,7 +182,7 @@ from flytekit.core.task import Secret, reference_task, task
 from flytekit.core.workflow import ImperativeWorkflow as Workflow
 from flytekit.core.workflow import WorkflowFailurePolicy, reference_workflow, workflow
 from flytekit.deck import Deck
-from flytekit.extras.persistence import GCSPersistence, HttpPersistence, S3Persistence
+from flytekit.extras.persistence import AzurePersistence, GCSPersistence, HttpPersistence, S3Persistence
 from flytekit.loggers import logger
 from flytekit.models.common import Annotations, AuthRole, Labels
 from flytekit.models.core.execution import WorkflowExecutionPhase

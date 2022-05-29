@@ -21,6 +21,7 @@ Persistence Extras
     S3Persistence
 """
 
+from flytekit.extras.persistence.abfs_azurecli import AzurePersistence
 from flytekit.extras.persistence.gcs_gsutil import GCSPersistence
 from flytekit.extras.persistence.http import HttpPersistence
 from flytekit.extras.persistence.s3_awscli import S3Persistence

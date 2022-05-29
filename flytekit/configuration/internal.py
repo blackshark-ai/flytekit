@@ -58,6 +58,21 @@ class GCP(object):
     GSUTIL_PARALLELISM = ConfigEntry(LegacyConfigEntry(SECTION, "gsutil_parallelism", bool))
 
 
+class AZURE(object):
+    SECTION = "azure"
+    AZURE_STORAGE_ACCOUNT = ConfigEntry(
+        LegacyConfigEntry(SECTION, "storage_account_name"), YamlConfigEntry("storage.connection.storage-account-name")
+    )
+    AZURE_STORAGE_KEY = ConfigEntry(
+        LegacyConfigEntry(SECTION, "storage_account_key"), YamlConfigEntry("storage.connection.storage-account-key")
+    )
+    RETRIES = ConfigEntry(LegacyConfigEntry(SECTION, "retries", int))
+    BACKOFF_SECONDS = ConfigEntry(
+        LegacyConfigEntry(SECTION, "backoff_seconds", datetime.timedelta),
+        transform=lambda x: datetime.timedelta(seconds=int(x)),
+    )
+
+
 class Credentials(object):
     SECTION = "credentials"
     COMMAND = ConfigEntry(LegacyConfigEntry(SECTION, "command", list), YamlConfigEntry("admin.command", list))
